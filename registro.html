@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITLA API - Registro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2><i class="bi bi-person-plus"></i> ITLA API</h2>
+            <p>Crea tu nueva cuenta</p>
+        </div>
+        
+        <!-- Alertas -->
+        <div id="alertContainer"></div>
+        
+        <!-- Formulario de Registro -->
+        <form id="registerForm">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" required>
+                <label for="nombre"><i class="bi bi-person"></i> Nombre completo</label>
+            </div>
+            
+            <div class="form-floating">
+                <input type="email" class="form-control" id="correo" placeholder="name@example.com" required>
+                <label for="correo"><i class="bi bi-envelope"></i> Correo electrónico</label>
+            </div>
+            
+            <div class="form-floating input-group-password">
+                <input type="password" class="form-control" id="clave" placeholder="Password" required>
+                <label for="clave"><i class="bi bi-lock"></i> Contraseña</label>
+                <button type="button" class="password-toggle" id="togglePassword">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            
+            <div class="form-floating input-group-password">
+                <input type="password" class="form-control" id="confirmarClave" placeholder="Confirm Password" required>
+                <label for="confirmarClave"><i class="bi bi-lock-fill"></i> Confirmar contraseña</label>
+                <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            
+            <div class="d-grid">
+                <button class="btn btn-primary btn-login" type="submit" id="registerBtn">
+                    <span id="registerBtnText">Crear Cuenta</span>
+                    <span id="registerSpinner" class="d-none">
+                        <span class="spinner-border loading-spinner" role="status"></span>
+                        Creando cuenta...
+                    </span>
+                </button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                ¿Ya tienes cuenta? <a href="index.html" class="text-decoration-none">Iniciar sesión</a>
+            </small>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/register.js"></script>
+</body>
+</html>
