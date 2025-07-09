@@ -173,22 +173,10 @@ class LoginForm {
      * Redirige después del login exitoso
      */
     redirectAfterLogin() {
-        // Callback personalizado si existe
-        if (typeof window.onRedirectAfterLogin === 'function') {
-            window.onRedirectAfterLogin();
-        } else {
-            // Comportamiento por defecto
-            console.log('Login exitoso! Token guardado:', AuthManager.getToken());
-            alert('Login exitoso! Token guardado en localStorage');
-            
-            // Descomenta para redirigir a dashboard
-            // window.location.href = '/dashboard.html';
-        }
-    }
-}
+        // Redirigir a eventos.html después del login exitoso
+        window.location.href = "eventos.html";}}
 
-// Inicializar cuando el DOM esté listo
+        // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     window.loginForm = new LoginForm();
 });
-

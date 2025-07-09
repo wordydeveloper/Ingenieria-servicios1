@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITLA API - Eventos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2><i class="bi bi-calendar-event"></i> Eventos</h2>
+            <p>Gestión de eventos</p>
+        </div>
+        <div id="alertContainer"></div>
+        <div class="mb-3 text-end">
+            <button class="btn btn-primary" id="btnNuevoEvento">
+                <i class="bi bi-plus-circle"></i> Nuevo Evento
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle" id="tablaEventos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Eventos aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Evento -->
+    <div class="modal fade" id="modalEvento" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <form class="modal-content" id="formEvento">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalEventoTitulo">Nuevo Evento</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+              <input type="hidden" id="eventoId">
+              <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="nombreEvento" placeholder="Nombre del evento" required>
+                  <label for="nombreEvento"><i class="bi bi-card-text"></i> Nombre</label>
+              </div>
+              <div class="form-floating mb-3">
+                  <input type="date" class="form-control" id="fechaEvento" placeholder="Fecha" required>
+                  <label for="fechaEvento"><i class="bi bi-calendar"></i> Fecha</label>
+              </div>
+              <div class="form-floating mb-3">
+                  <select class="form-select" id="estadoEvento" required>
+                      <option value="AC">Activo</option>
+                      <option value="IN">Inactivo</option>
+                  </select>
+                  <label for="estadoEvento"><i class="bi bi-toggle-on"></i> Estado</label>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btnGuardarEvento">
+                <span id="eventoBtnText">Guardar</span>
+                <span id="eventoSpinner" class="d-none">
+                    <span class="spinner-border loading-spinner" role="status"></span>
+                    Guardando...
+                </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/eventos.js"></script>
+</body>
+</html>

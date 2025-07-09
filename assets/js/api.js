@@ -104,13 +104,14 @@ class AuthApiClient extends ApiClient {
     /**
      * Registro de usuario
      */
-    async register(nombre, correo, clave) {
-        return this.post(CONFIG.ENDPOINTS.REGISTER, {
-            nombre,
-            correo,
-            clave
-        }, { includeAuth: false });
-    }
+   async register(nombre, correo, clave, rolId) {
+    return this.post(CONFIG.ENDPOINTS.REGISTER, {
+        nombre,
+        correo,
+        clave,
+        rolId
+    }, { includeAuth: false });
+}
 
     /**
      * Verificar token (ejemplo de endpoint protegido)

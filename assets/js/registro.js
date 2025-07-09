@@ -159,9 +159,11 @@ class RegisterForm {
 
         try {
             const response = await authApi.register(
-                formData.nombre,
-                formData.correo,
-                formData.clave
+    formData.nombre,
+    formData.correo,
+    formData.clave,
+    1// o el rolId que corresponda (2 = Usuario, por ejemplo)  /cambie aqui tambien para que se registre por defecto como usuario ad
+
             );
             
             if (response.data) {
