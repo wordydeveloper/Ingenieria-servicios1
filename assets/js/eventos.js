@@ -1,129 +1,119 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const tabla = document.querySelector('#tablaEventos tbody');
-    const alertManager = new AlertManager('alertContainer');
-    const modalEvento = new bootstrap.Modal(document.getElementById('modalEvento'));
-    const formEvento = document.getElementById('formEvento');
-    const btnNuevoEvento = document.getElementById('btnNuevoEvento');
-    const btnGuardarEvento = document.getElementById('btnGuardarEvento');
-    const eventoBtnText = document.getElementById('eventoBtnText');
-    const eventoSpinner = document.getElementById('eventoSpinner');
+const API_URL = 'http://127.0.0.1:8000/internal/evento'; // Ajusta si usas dominio distinto
 
-    // Campos del formulario
-    const eventoId = document.getElementById('eventoId');
-    const nombreEvento = document.getElementById('nombreEvento');
-    const fechaEvento = document.getElementById('fechaEvento');
-    const estadoEvento = document.getElementById('estadoEvento');
-    const modalTitulo = document.getElementById('modalEventoTitulo');
+document.addEventListener('DOMContentLoaded', () => {
+  cargarEventos();
 
-    // Loading manager para el botón guardar
-    const loadingManager = new LoadingManager('btnGuardarEvento', 'eventoBtnText', 'eventoSpinner');
+  document.getElementById('formEvento').addEventListener('submit', guardarEvento);
+  document.getElementById('btnNuevoEvento').addEventListener('click', () => {
+    document.getElementById('modalEventoTitulo').innerHTML = '<i class="bi bi-calendar-plus"></i> Nuevo Evento';
+    document.getElementById('formEvento').reset();
+    document.getElementById('eventoId').value = '';
+    new bootstrap.Modal(document.getElementById('modalEvento')).show();
+  });
+});
 
-    // Listar eventos
-    async function cargarEventos() {
-        tabla.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
-        try {
-            const data = await apiClient.get('/internal/evento/');
-            tabla.innerHTML = '';
-            if (data && data.length > 0) {
-                data.forEach(ev => {
-                    tabla.innerHTML += `
-                        <tr>
-                            <td>${ev.id}</td>
-                            <td>${ev.nombre}</td>
-                            <td>${ev.fecha ? ev.fecha.split('T')[0] : ''}</td>
-                            <td>${ev.estado === 'AC' ? 'Activo' : 'Inactivo'}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning btn-editar" data-id="${ev.id}"><i class="bi bi-pencil"></i></button>
-                                <button class="btn btn-sm btn-danger btn-eliminar" data-id="${ev.id}"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } else {
-                tabla.innerHTML = '<tr><td colspan="5" class="text-center">No hay eventos registrados.</td></tr>';
-            }
-        } catch (err) {
-            tabla.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar eventos.</td></tr>';
-            alertManager.show('No se pudieron cargar los eventos.', 'danger');
-        }
-    }
+async function cargarEventos() {
+  const tbody = document.querySelector('#tablaEventos tbody');
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="table-loading">
+        <div class="spinner-border text-primary"></div>
+        <div>Cargando eventos...</div>
+      </td>
+    </tr>
+  `;
 
-    // Mostrar modal para nuevo evento
-    btnNuevoEvento.addEventListener('click', () => {
-        formEvento.reset();
-        eventoId.value = '';
-        modalTitulo.textContent = 'Nuevo Evento';
-        modalEvento.show();
+  try {
+    const res = await fetch(`${API_URL}/`);
+    const data = await res.json();
+
+    document.getElementById('eventCount').textContent = data.length;
+
+    tbody.innerHTML = data.map(evento => `
+      <tr>
+        <td>${evento.id}</td>
+        <td>${evento.nombre}</td>
+        <td>${evento.fecha}</td>
+        <td>
+          <span class="badge ${evento.estado === 'AC' ? 'badge-active' : 'badge-inactive'}">
+            ${evento.estado === 'AC' ? 'Activo' : 'Inactivo'}
+          </span>
+        </td>
+        <td class="table-actions">
+          <button class="btn btn-warning" onclick="editarEvento(${evento.id})"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn btn-danger" onclick="confirmarEliminar(${evento.id})"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error(error);
+    tbody.innerHTML = `<tr><td colspan="5"><div class="alert alert-danger">Error al cargar eventos</div></td></tr>`;
+  }
+}
+
+async function guardarEvento(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('eventoId').value;
+  const nombre = document.getElementById('nombreEvento').value;
+  const fecha = document.getElementById('fechaEvento').value;
+  const estado = document.getElementById('estadoEvento').value;
+
+  const payload = { nombre, fecha, estado };
+
+  const btn = document.getElementById('btnGuardarEvento');
+  document.getElementById('eventoBtnText').classList.add('d-none');
+  document.getElementById('eventoSpinner').classList.remove('d-none');
+
+  try {
+    const res = await fetch(`${API_URL}/${id ? 'actualizar' : 'registrar'}`, {
+      method: id ? 'PATCH' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(id ? { id: parseInt(id), ...payload } : payload)
     });
 
-    // Guardar evento (crear o actualizar)
-    formEvento.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        loadingManager.setLoading(true);
+    if (!res.ok) throw new Error('Error al guardar');
 
-        const evento = {
-            nombre: nombreEvento.value.trim(),
-            fecha: fechaEvento.value,
-            estado: estadoEvento.value
-        };
-
-        try {
-            if (eventoId.value) {
-                // Actualizar
-                await apiClient.request('/internal/evento/actualizar', {
-                    method: 'PATCH',
-                    body: JSON.stringify({ id: eventoId.value, ...evento }),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                alertManager.show('Evento actualizado correctamente', 'success');
-            } else {
-                // Crear
-                await apiClient.post('/internal/evento/registrar', evento);
-                alertManager.show('Evento registrado correctamente', 'success');
-            }
-            modalEvento.hide();
-            cargarEventos();
-        } catch (err) {
-            alertManager.show('Error al guardar el evento', 'danger');
-        } finally {
-            loadingManager.setLoading(false);
-        }
-    });
-
-    // Editar evento
-    tabla.addEventListener('click', async function(e) {
-        if (e.target.closest('.btn-editar')) {
-            const id = e.target.closest('.btn-editar').dataset.id;
-            try {
-                const data = await apiClient.get(`/internal/evento/${id}`);
-                eventoId.value = data.id;
-                nombreEvento.value = data.nombre;
-                fechaEvento.value = data.fecha ? data.fecha.split('T')[0] : '';
-                estadoEvento.value = data.estado;
-                modalTitulo.textContent = 'Editar Evento';
-                modalEvento.show();
-            } catch (err) {
-                alertManager.show('No se pudo cargar el evento', 'danger');
-            }
-        }
-    });
-
-    // Eliminar evento
-    tabla.addEventListener('click', async function(e) {
-        if (e.target.closest('.btn-eliminar')) {
-            const id = e.target.closest('.btn-eliminar').dataset.id;
-            if (confirm('¿Seguro que deseas eliminar este evento?')) {
-                try {
-                    await apiClient.delete(`/internal/evento/${id}`);
-                    alertManager.show('Evento eliminado', 'success');
-                    cargarEventos();
-                } catch (err) {
-                    alertManager.show('No se pudo eliminar el evento', 'danger');
-                }
-            }
-        }
-    });
-
-    // Inicializar
+    bootstrap.Modal.getInstance(document.getElementById('modalEvento')).hide();
     cargarEventos();
+  } catch (err) {
+    alert('Error al guardar el evento');
+  } finally {
+    document.getElementById('eventoBtnText').classList.remove('d-none');
+    document.getElementById('eventoSpinner').classList.add('d-none');
+  }
+}
+
+async function editarEvento(id) {
+  try {
+    const res = await fetch(`${API_URL}/${id}`);
+    const evento = await res.json();
+
+    document.getElementById('modalEventoTitulo').innerHTML = '<i class="bi bi-pencil-square"></i> Editar Evento';
+    document.getElementById('eventoId').value = evento.id;
+    document.getElementById('nombreEvento').value = evento.nombre;
+    document.getElementById('fechaEvento').value = evento.fecha;
+    document.getElementById('estadoEvento').value = evento.estado;
+
+    new bootstrap.Modal(document.getElementById('modalEvento')).show();
+  } catch (err) {
+    alert('No se pudo cargar el evento');
+  }
+}
+
+let idAEliminar = null;
+function confirmarEliminar(id) {
+  idAEliminar = id;
+  new bootstrap.Modal(document.getElementById('modalConfirmarEliminar')).show();
+}
+
+document.getElementById('btnConfirmarEliminar').addEventListener('click', async () => {
+  try {
+    const res = await fetch(`${API_URL}/${idAEliminar}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Error al eliminar');
+    bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar')).hide();
+    cargarEventos();
+  } catch (err) {
+    alert('Error al eliminar evento');
+  }
 });
