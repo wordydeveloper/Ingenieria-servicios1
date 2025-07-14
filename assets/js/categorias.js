@@ -24,11 +24,10 @@ async function cargarCategorias() {
       llenarTabla(data.data);
     } else {
       alert("Error al cargar categorías.");
-      console.error(data);
     }
   } catch (error) {
-    console.error("Error de red:", error);
-    alert("No se pudo conectar al servidor.");
+    alert("Error de red al cargar categorías.");
+    console.error(error);
   }
 }
 
@@ -37,9 +36,8 @@ function llenarTabla(categorias) {
   tabla.innerHTML = "";
 
   categorias.forEach(cat => {
-    const estadoEsActivo = cat.estado === "AC";
-    const estadoTexto = estadoEsActivo ? "Activo" : "Inactivo";
-    const estadoBadge = estadoEsActivo ? "success" : "secondary";
+    const estadoTexto = cat.estado === "AC" ? "Activo" : "Inactivo";
+    const estadoBadge = cat.estado === "AC" ? "success" : "secondary";
 
     const fila = document.createElement("tr");
     fila.innerHTML = `
@@ -62,69 +60,122 @@ async function registrarCategoria() {
   }
 
   try {
-    const body = { nombre: nombre, estado: estado };
-    console.log("Enviando:", body);
-
     const response = await fetch("http://127.0.0.1:8000/internal/categoria-evento/registrar", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ nombre, estado })
+    });
+
+    if (response.ok) {
+      alert("Categoría registrada correctamente.");
+      bootstrap.Modal.getInstance(document.getElementById("modalRegistrar")).hide();
+      document.getElementById("nombreCategoria").value = "";
+      document.getElementById("estadoCategoria").value = "AC";
+      cargarCategorias();
+    } else {
+      alert("Error al registrar categoría.");
+    }
+  } catch (error) {
+    alert("Error de red al registrar.");
+    console.error(error);
+  }
+}
+
+async function buscarCategoriaPorId() {
+  const id = document.getElementById("idCategoriaActualizar").value.trim();
+  const token = localStorage.getItem("access_token");
+
+  if (!id) {
+    alert("Ingresa un ID.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/internal/categoria-evento/${id}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
     });
 
     const data = await response.json();
 
-    if (response.ok) {
-      alert("Categoría registrada correctamente");
-      document.getElementById("nombreCategoria").value = "";
-      cargarCategorias();
+    if (response.ok && data.data) {
+      document.getElementById("nombreCategoriaActualizar").value = data.data.nombre;
+      document.getElementById("estadoCategoriaActualizar").value = data.data.estado;
     } else {
-      alert("Error al registrar categoría.");
-      console.error(data);
+      alert("Categoría no encontrada.");
     }
   } catch (error) {
-    console.error("Error de red:", error);
-    alert("No se pudo conectar al servidor.");
+    alert("Error de red.");
+    console.error(error);
   }
 }
 
 async function actualizarCategoria() {
-  const id = document.getElementById("idCategoriaActualizar").value.trim();
+  const id = parseInt(document.getElementById("idCategoriaActualizar").value.trim());
   const nombre = document.getElementById("nombreCategoriaActualizar").value.trim();
   const estado = document.getElementById("estadoCategoriaActualizar").value;
   const token = localStorage.getItem("access_token");
 
   if (!id || !nombre) {
-    alert("ID y nombre son obligatorios.");
+    alert("ID y nombre obligatorios.");
     return;
   }
 
   try {
-    const body = { nombre, estado };
-    console.log("Actualizando:", body);
-
-    const response = await fetch(`http://127.0.0.1:8000/internal/categoria-evento/${id}`, {
+    const response = await fetch("http://127.0.0.1:8000/internal/categoria-evento/actualizar", {
       method: "PATCH",
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ categoriaEventoId: id, nombre, estado })
     });
 
-    const data = await response.json();
-
     if (response.ok) {
-      alert("Categoría actualizada correctamente");
+      alert("Categoría actualizada.");
+      bootstrap.Modal.getInstance(document.getElementById("modalActualizar")).hide();
       cargarCategorias();
     } else {
-      alert("Error al actualizar categoría.");
-      console.error(data);
+      alert("Error al actualizar.");
     }
   } catch (error) {
-    console.error("Error de red:", error);
-    alert("No se pudo conectar al servidor.");
+    alert("Error de red.");
+    console.error(error);
+  }
+}
+
+async function eliminarCategoria() {
+  const id = document.getElementById("idCategoriaActualizar").value.trim();
+  const token = localStorage.getItem("access_token");
+
+  if (!id) {
+    alert("ID obligatorio.");
+    return;
+  }
+
+  if (!confirm("¿Seguro que deseas eliminar esta categoría?")) return;
+
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/internal/categoria-evento/eliminar/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      alert("Categoría eliminada.");
+      bootstrap.Modal.getInstance(document.getElementById("modalActualizar")).hide();
+      cargarCategorias();
+    } else {
+      alert("Error al eliminar.");
+    }
+  } catch (error) {
+    alert("Error de red.");
+    console.error(error);
   }
 }
