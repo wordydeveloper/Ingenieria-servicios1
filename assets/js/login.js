@@ -1,20 +1,13 @@
-// Script específico para la página de login
-
-/**
- * Clase para manejar el formulario de login
- */
 class LoginForm {
     constructor() {
         this.form = document.getElementById('loginForm');
         this.correoInput = document.getElementById('correo');
         this.claveInput = document.getElementById('clave');
         
-        // Inicializar componentes
         this.alertManager = new AlertManager('alertContainer');
         this.loadingManager = new LoadingManager('loginBtn', 'loginBtnText', 'loginSpinner');
         this.passwordToggle = new PasswordToggle('clave', 'togglePassword');
         
-        // Reglas de validación
         this.validationRules = {
             correo: {
                 required: true,
@@ -37,19 +30,12 @@ class LoginForm {
             return;
         }
 
-        // Escuchar el evento submit del formulario
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-
-        // Verificar si ya está autenticado
         this.checkAuthStatus();
     }
 
-    /**
-     * Maneja el envío del formulario
-     */
     async handleSubmit(event) {
         event.preventDefault();
-        
         this.alertManager.clear();
         
         const formData = this.getFormData();
@@ -63,9 +49,6 @@ class LoginForm {
         await this.performLogin(formData.correo, formData.clave);
     }
 
-    /**
-     * Obtiene los datos del formulario
-     */
     getFormData() {
         return {
             correo: this.correoInput.value.trim(),
@@ -73,16 +56,10 @@ class LoginForm {
         };
     }
 
-    /**
-     * Valida el formulario
-     */
     validateForm(formData) {
         return FormValidator.validateForm(formData, this.validationRules);
     }
 
-    /**
-     * Realiza el login
-     */
     async performLogin(correo, clave) {
         this.loadingManager.setLoading(true);
 
@@ -101,37 +78,31 @@ class LoginForm {
             this.loadingManager.setLoading(false);
         }
     }
+handleLoginSuccess(data) {
+    const tokenType = data.tokenType || "Bearer";
+    const accessToken = data.accessToken;
 
-    /**
-     * Maneja el login exitoso
-     */
-    handleLoginSuccess(data) {
-        // Guardar token
-        AuthManager.saveToken(data.accessToken, data.tokenType);
-        
-        // Mostrar mensaje de éxito
-        this.alertManager.show('¡Login exitoso! Redirigiendo...', 'success');
-        
-        // Limpiar formulario
-        this.form.reset();
-        
-        // Callback personalizado si existe
-        if (typeof window.onLoginSuccess === 'function') {
-            window.onLoginSuccess(data);
-        }
-        
-        // Redirigir después de un delay
-        setTimeout(() => {
-            this.redirectAfterLogin();
-        }, CONFIG.TIMEOUTS.REDIRECT_DELAY);
+    // Guarda el token en AuthManager (si ya lo necesitas ahí)
+    AuthManager.saveToken(accessToken, tokenType);
+
+    // Guarda también en localStorage con la clave que usas luego
+    localStorage.setItem("access_token", accessToken);
+
+    this.alertManager.show('¡Login exitoso! Redirigiendo...', 'success');
+    this.form.reset();
+
+    if (typeof window.onLoginSuccess === 'function') {
+        window.onLoginSuccess(data);
     }
 
-    /**
-     * Maneja errores de login
-     */
+    setTimeout(() => {
+        this.redirectAfterLogin();
+    }, CONFIG.TIMEOUTS.REDIRECT_DELAY);
+}
+
+
     handleLoginError(error) {
         let errorMessage = 'Error al iniciar sesión. Por favor, intenta nuevamente.';
-        
         const errorText = Utils.formatError(error);
         
         if (errorText.includes('No existe un usuario')) {
@@ -143,40 +114,32 @@ class LoginForm {
         } else if (errorText.includes('NetworkError') || errorText.includes('Failed to fetch')) {
             errorMessage = 'Error de red. Verifica tu conexión a internet.';
         }
-        
+
         this.alertManager.show(errorMessage);
-        
-        // Callback personalizado si existe
+
         if (typeof window.onLoginError === 'function') {
             window.onLoginError(error);
         }
     }
-
-    /**
-     * Verifica el estado de autenticación al cargar la página
-     */
-    checkAuthStatus() {
-        if (AuthManager.isAuthenticated()) {
-            console.log('Usuario ya autenticado');
-            
-            // Callback personalizado si existe
-            if (typeof window.onAlreadyAuthenticated === 'function') {
-                window.onAlreadyAuthenticated();
-            } else {
-                // Comportamiento por defecto: mostrar mensaje
-                this.alertManager.show('Ya tienes una sesión activa.', 'info');
-            }
+checkAuthStatus() {
+    const token = localStorage.getItem("access_token");
+    
+    if (token) {
+        console.log('Usuario ya autenticado');
+        if (typeof window.onAlreadyAuthenticated === 'function') {
+            window.onAlreadyAuthenticated();
+        } else {
+            this.alertManager.show('Ya tienes una sesión activa.', 'info');
         }
     }
+}
 
-    /**
-     * Redirige después del login exitoso
-     */
+
     redirectAfterLogin() {
-        // Redirigir a eventos.html después del login exitoso
-        window.location.href = "eventos.html";}}
+        window.location.href = "eventos.html";
+    }
+}
 
-        // Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     window.loginForm = new LoginForm();
 });

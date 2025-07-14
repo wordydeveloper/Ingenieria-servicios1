@@ -12,7 +12,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark custom-navbar mb-4">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="index.html">
         <i class="bi bi-house-door-fill"></i> ITLA API
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido" aria-controls="navbarContenido" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,8 +22,11 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="eventos.html"><i class="bi bi-calendar-event"></i> Eventos</a></li>
           <li class="nav-item"><a class="nav-link active" href="categorias.html"><i class="bi bi-tags-fill"></i> Categorías</a></li>
-          <li class="nav-item"><a class="nav-link" href="usuarios.html"><i class="bi bi-people-fill"></i> Usuarios</a></li>
-          <li class="nav-item"><a class="nav-link" href="editoriales.html"><i class="bi bi-journal-bookmark-fill"></i> Editoriales</a></li>
+          <li class="nav-item">
+            <button class="btn btn-outline-light btn-sm ms-3" onclick="cerrarSesion()">
+              <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+            </button>
+          </li>
         </ul>
       </div>
     </div>
@@ -32,9 +35,21 @@
   <!-- Contenido -->
   <div class="container">
     <h2 class="mb-3">Registrar nueva categoría</h2>
-    <div class="input-group mb-3">
-      <input type="text" id="nombreCategoria" class="form-control" placeholder="Nombre de categoría">
-      <button class="btn btn-success" onclick="registrarCategoria()">Registrar</button>
+    <div class="row g-2 align-items-center mb-3">
+      <div class="col-md-5">
+        <input type="text" id="nombreCategoria" class="form-control" placeholder="Nombre de categoría">
+      </div>
+      <div class="col-md-3">
+        
+       <select id="estadoCategoria" class="form-select">
+  <option value="AC" selected>Activo</option>
+  <option value="IN">Inactivo</option>
+</select>
+
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-success w-100" onclick="registrarCategoria()">Registrar</button>
+      </div>
     </div>
 
     <h3>Categorías Registradas</h3>
@@ -43,13 +58,21 @@
         <tr>
           <th>ID</th>
           <th>Nombre</th>
-          <th>Acciones</th>
+          <th>Estado</th>
         </tr>
       </thead>
       <tbody id="tablaCategorias"></tbody>
     </table>
   </div>
 
-  <script src="/Ingenieria-servicios1/assets/js/categorias.js"></script>
+  <!-- Scripts -->
+  <script src="assets/js/helpers/AuthManager.js"></script>
+  <script>
+    function cerrarSesion() {
+      AuthManager.logout();
+      window.location.href = "login.html";
+    }
+  </script>
+  <script src="assets/js/categorias.js"></script>
 </body>
 </html>

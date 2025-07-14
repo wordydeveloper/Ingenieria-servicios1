@@ -1,72 +1,130 @@
-const API_URL = "http://127.0.0.1:8000/internal/categoria-evento";
-const token = localStorage.getItem("token");
+document.addEventListener("DOMContentLoaded", () => {
+  cargarCategorias();
+});
 
-function cargarCategorias() {
-  fetch(API_URL + "/", {
-    headers: {
-      "Authorization": "Bearer " + token
-    }
-  })
-  .then(res => res.json())
-  .then(data => {
-    const tbody = document.getElementById("tablaCategorias");
-    tbody.innerHTML = "";
-    data.data.forEach(cat => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${cat.categoriaEventoId}</td>
-          <td><input type="text" class="form-control" id="nombre-${cat.categoriaEventoId}" value="${cat.nombre}"></td>
-          <td>
-            <button class="btn btn-primary btn-sm" onclick="actualizarCategoria(${cat.categoriaEventoId})">Actualizar</button>
-          </td>
-        </tr>
-      `;
+async function cargarCategorias() {
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    alert("No estás autenticado.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/internal/categoria-evento/", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
     });
-  })
-  .catch(error => alert("Error cargando categorías: " + error));
+
+    const data = await response.json();
+
+    if (response.ok && data.data) {
+      llenarTabla(data.data);
+    } else {
+      alert("Error al cargar categorías.");
+      console.error(data);
+    }
+  } catch (error) {
+    console.error("Error de red:", error);
+    alert("No se pudo conectar al servidor.");
+  }
 }
 
-function registrarCategoria() {
-  const nombre = document.getElementById("nombreCategoria").value;
-  fetch(API_URL + "/registrar", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    },
-    body: JSON.stringify({ nombre })
-  })
-  .then(res => {
-    if (res.status === 201) {
+function llenarTabla(categorias) {
+  const tabla = document.getElementById("tablaCategorias");
+  tabla.innerHTML = "";
+
+  categorias.forEach(cat => {
+    const estadoEsActivo = cat.estado === "AC";
+    const estadoTexto = estadoEsActivo ? "Activo" : "Inactivo";
+    const estadoBadge = estadoEsActivo ? "success" : "secondary";
+
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td>${cat.categoriaEventoId}</td>
+      <td><strong>${cat.nombre}</strong></td>
+      <td><span class="badge bg-${estadoBadge}">${estadoTexto}</span></td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+async function registrarCategoria() {
+  const nombre = document.getElementById("nombreCategoria").value.trim();
+  const estado = document.getElementById("estadoCategoria").value;
+  const token = localStorage.getItem("access_token");
+
+  if (!nombre) {
+    alert("El nombre es obligatorio.");
+    return;
+  }
+
+  try {
+    const body = { nombre: nombre, estado: estado };
+    console.log("Enviando:", body);
+
+    const response = await fetch("http://127.0.0.1:8000/internal/categoria-evento/registrar", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
       alert("Categoría registrada correctamente");
-      cargarCategorias();
       document.getElementById("nombreCategoria").value = "";
-    } else {
-      return res.json().then(err => { throw new Error(err.detail); });
-    }
-  })
-  .catch(error => alert("Error registrando: " + error.message));
-}
-
-function actualizarCategoria(id) {
-  const nombre = document.getElementById(`nombre-${id}`).value;
-  fetch(API_URL + "/actualizar", {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    },
-    body: JSON.stringify({ categoriaEventoId: id, nombre })
-  })
-  .then(res => {
-    if (res.ok) {
-      alert("Categoría actualizada");
       cargarCategorias();
     } else {
-      return res.json().then(err => { throw new Error(err.detail); });
+      alert("Error al registrar categoría.");
+      console.error(data);
     }
-  })
-  .catch(error => alert("Error actualizando: " + error.message));
+  } catch (error) {
+    console.error("Error de red:", error);
+    alert("No se pudo conectar al servidor.");
+  }
 }
 
-window.onload = cargarCategorias;
+async function actualizarCategoria() {
+  const id = document.getElementById("idCategoriaActualizar").value.trim();
+  const nombre = document.getElementById("nombreCategoriaActualizar").value.trim();
+  const estado = document.getElementById("estadoCategoriaActualizar").value;
+  const token = localStorage.getItem("access_token");
+
+  if (!id || !nombre) {
+    alert("ID y nombre son obligatorios.");
+    return;
+  }
+
+  try {
+    const body = { nombre, estado };
+    console.log("Actualizando:", body);
+
+    const response = await fetch(`http://127.0.0.1:8000/internal/categoria-evento/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Categoría actualizada correctamente");
+      cargarCategorias();
+    } else {
+      alert("Error al actualizar categoría.");
+      console.error(data);
+    }
+  } catch (error) {
+    console.error("Error de red:", error);
+    alert("No se pudo conectar al servidor.");
+  }
+}
