@@ -1,0 +1,536 @@
+:root {
+  --itla-primary: #1e3a8a;
+  --itla-secondary: #3b82f6;
+  --itla-accent: #0ea5e9;
+  --itla-dark: #1e293b;
+  --itla-light: #f8fafc;
+  --itla-white: #ffffff;
+  --itla-gray: #64748b;
+  --itla-success: #059669;
+  --itla-warning: #d97706;
+  --itla-danger: #dc2626;
+  
+  --gradient-primary: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  --gradient-secondary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  --gradient-hero: linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #1e293b 100%);
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: var(--itla-light);
+  color: var(--itla-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes countUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-fadeIn { animation: fadeIn 0.6s ease-out; }
+.animate-slideInLeft { animation: slideInLeft 0.6s ease-out; }
+.animate-slideInRight { animation: slideInRight 0.6s ease-out; }
+.animate-pulse { animation: pulse 2s infinite; }
+.animate-countUp { animation: countUp 0.5s ease-out; }
+
+/* Layout Principal */
+.itla-container {
+  min-height: 100vh;
+  background: var(--itla-light);
+}
+
+/* Header Institucional */
+.itla-header {
+  background: var(--itla-white);
+  border-bottom: 3px solid var(--itla-primary);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.itla-header .container-fluid {
+  padding: 1rem 2rem;
+}
+
+.itla-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.itla-logo img {
+  height: 60px;
+  width: auto;
+}
+
+.itla-logo-text {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--itla-primary);
+  text-decoration: none;
+}
+
+.itla-user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--itla-dark);
+}
+
+.user-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Navegación Principal */
+.itla-nav {
+  background: var(--gradient-primary);
+  padding: 0;
+  box-shadow: var(--shadow-md);
+}
+
+.itla-nav .nav-link {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  padding: 1rem 1.5rem;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.itla-nav .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-bottom-color: var(--itla-accent);
+}
+
+.itla-nav .nav-link.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-bottom-color: white;
+}
+
+/* Dashboard Principal */
+.itla-dashboard {
+  padding: 2rem 0;
+  background: var(--itla-light);
+}
+
+.dashboard-header {
+  background: var(--itla-white);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+  border-left: 5px solid var(--itla-primary);
+}
+
+.dashboard-title {
+  color: var(--itla-primary);
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+  color: var(--itla-gray);
+  font-size: 1.1rem;
+}
+
+/* Estadísticas Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--itla-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid var(--itla-secondary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 50%;
+  transform: translate(30px, -30px);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.stat-icon.books { background: var(--gradient-primary); }
+.stat-icon.events { background: var(--gradient-secondary); }
+.stat-icon.categories { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+.stat-icon.editorials { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--itla-primary);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.stat-label {
+  color: var(--itla-gray);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.stat-change {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.stat-change.positive { color: var(--itla-success); }
+.stat-change.negative { color: var(--itla-danger); }
+
+/* Cards de Contenido */
+.content-card {
+  background: var(--itla-white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.content-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.content-card-header {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1.5rem;
+  border-bottom: none;
+}
+
+.content-card-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.content-card-body {
+  padding: 1.5rem;
+}
+
+/* Tablas Mejoradas */
+.itla-table {
+  background: var(--itla-white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.itla-table .table {
+  margin: 0;
+}
+
+.itla-table thead th {
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 1rem;
+  font-size: 0.95rem;
+}
+
+.itla-table tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.itla-table tbody tr:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.itla-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* Botones Institucionales */
+.btn-itla-primary {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-itla-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  color: white;
+}
+
+.btn-itla-secondary {
+  background: var(--gradient-secondary);
+  border: none;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-itla-outline {
+  background: transparent;
+  border: 2px solid var(--itla-primary);
+  color: var(--itla-primary);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-itla-outline:hover {
+  background: var(--itla-primary);
+  color: white;
+}
+
+/* Badges Institucionales */
+.badge-itla {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.badge-available {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+}
+
+.badge-unavailable {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+}
+
+.badge-limited {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: white;
+}
+
+/* Modales Institucionales */
+.modal-itla .modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: var(--shadow-xl);
+}
+
+.modal-itla .modal-header {
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.5rem;
+}
+
+.modal-itla .modal-body {
+  padding: 2rem;
+}
+
+.modal-itla .modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Login Form Institucional */
+.login-container {
+  min-height: 100vh;
+  background: var(--gradient-hero);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/placeholder.svg?height=1080&width=1920') center/cover;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xl);
+  padding: 3rem;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  z-index: 2;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-logo img {
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+.login-title {
+  color: var(--itla-primary);
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: var(--itla-gray);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Formularios */
+.form-group-itla {
+  margin-bottom: 1.5rem;
+}
+
+.form-label-itla {
+  color: var(--itla-dark);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control-itla {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-control-itla:focus {
+  outline: none;
+  border-color: var(--itla-primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .itla-header .container-fluid {
+    padding: 1rem;
+  }
+  
+  .itla-logo-text {
+    font-size: 1.4rem;
+  }
+  
+  .dashboard-title {
+    font-size: 1.8rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .login-card {
+    margin: 1rem;
+    padding: 2rem;
+  }
+}
+
+/* Utilidades */
+.text-itla-primary { color: var(--itla-primary); }
+.text-itla-secondary { color: var(--itla-secondary); }
+.bg-itla-primary { background: var(--itla-primary); }
+.bg-itla-light { background: var(--itla-light); }
+
+.hover-lift {
+  transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+}
