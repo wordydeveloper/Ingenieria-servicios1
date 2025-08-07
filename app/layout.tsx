@@ -4,11 +4,11 @@ import { AuthProvider } from "@/contexts/AuthContext"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./globals.css"
 import Script from "next/script"
+import ErrorBoundary from "@/components/ErrorBoundary"
 
 export const metadata: Metadata = {
   title: "Sistema ITLA - Gestión Académica",
   description: "Sistema integral para la gestión de eventos, libros y recursos académicos",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -26,7 +26,9 @@ export default function RootLayout({
         }} />
       </head>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>{children}</AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

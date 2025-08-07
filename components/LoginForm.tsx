@@ -85,7 +85,7 @@ export default function LoginForm() {
                 className="form-control-itla"
                 id="nombre"
                 name="nombre"
-                value={formData.nombre}
+                value={formData.nombre || ""}  // Ensure never undefined
                 onChange={handleChange}
                 placeholder="Ingresa tu nombre completo"
                 required
@@ -102,7 +102,7 @@ export default function LoginForm() {
               className="form-control-itla"
               id="correo"
               name="correo"
-              value={formData.correo}
+              value={formData.correo || ""}  // Ensure never undefined
               onChange={handleChange}
               placeholder="usuario@itla.edu.do"
               required
@@ -118,7 +118,7 @@ export default function LoginForm() {
               className="form-control-itla"
               id="clave"
               name="clave"
-              value={formData.clave}
+              value={formData.clave || ""}  // Ensure never undefined
               onChange={handleChange}
               placeholder="••••••••"
               required
@@ -134,7 +134,7 @@ export default function LoginForm() {
                 className="form-control-itla"
                 id="rolId"
                 name="rolId"
-                value={formData.rolId}
+                value={formData.rolId || 1}  // Ensure never undefined
                 onChange={handleChange}
               >
                 <option value={1}>👑 Administrador</option>

@@ -53,10 +53,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Decodificar el token para obtener la información del usuario
         const payload = JSON.parse(atob(accessToken.split(".")[1]))
         const userData = {
-          id: payload.sub,
-          nombre: payload.nombre || correo.split("@")[0],
-          correo: correo,
-          rolId: payload.rolId || 1,
+          id: payload.sub || 0,                           // Ensure never undefined
+          nombre: payload.nombre || correo.split("@")[0] || "Usuario", // Ensure never undefined
+          correo: correo || "",                           // Ensure never undefined
+          rolId: payload.rolId || 1,                      // Ensure never undefined
         }
 
         setToken(accessToken)

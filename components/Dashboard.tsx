@@ -6,23 +6,23 @@ import CategoriasEventos from "./CategoriasEventos"
 import Eventos from "./Eventos"
 import Libros from "./Libros"
 import Editoriales from "./Editoriales"
-
-interface Stats {
-  totalLibros: number
-  librosDisponibles: number
-  totalEventos: number
-  totalCategorias: number
-  totalEditoriales: number
-}
+import ProgramasAcademicos from "./ProgramasAcademicos"
+import Materias from "./Materias"
+import Estudiantes from "./Estudiantes"
+import Graficas from "./Graficas"
+import type { EstadisticasGenerales } from "@/types/interfaces"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard")
-  const [stats, setStats] = useState<Stats>({
+  const [stats, setStats] = useState<EstadisticasGenerales>({
     totalLibros: 0,
     librosDisponibles: 0,
     totalEventos: 0,
     totalCategorias: 0,
-    totalEditoriales: 0
+    totalEditoriales: 0,
+    totalProgramas: 0,
+    totalMaterias: 0,
+    totalEstudiantes: 0
   })
   const [loading, setLoading] = useState(true)
   const { user, logout, token } = useAuth()
@@ -38,32 +38,25 @@ export default function Dashboard() {
   const fetchStats = async () => {
     setLoading(true)
     try {
-      // Fetch libros
-      const librosResponse = await fetch("http://127.0.0.1:8000/internal/libro/", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      
-      // Fetch eventos
-      const eventosResponse = await fetch("http://127.0.0.1:8000/internal/evento/", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      
-      // Fetch categorías
-      const categoriasResponse = await fetch("http://127.0.0.1:8000/internal/categoria-evento/", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      
-      // Fetch editoriales
-      const editorialesResponse = await fetch("http://127.0.0.1:8000/internal/editorial/", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const endpoints = [
+        "http://127.0.0.1:8000/internal/libro/",
+        "http://127.0.0.1:8000/internal/evento/",
+        "http://127.0.0.1:8000/internal/categoria-evento/",
+        "http://127.0.0.1:8000/internal/editorial/",
+        "http://127.0.0.1:8000/internal/programa-academico/",
+        "http://127.0.0.1:8000/internal/materia/",
+        "http://127.0.0.1:8000/internal/estudiante/?limite=1000"
+      ]
 
-      const [librosData, eventosData, categoriasData, editorialesData] = await Promise.all([
-        librosResponse.ok ? librosResponse.json() : { data: [] },
-        eventosResponse.ok ? eventosResponse.json() : { data: [] },
-        categoriasResponse.ok ? categoriasResponse.json() : { data: [] },
-        editorialesResponse.ok ? editorialesResponse.json() : { data: [] }
-      ])
+      const responses = await Promise.allSettled(
+        endpoints.map(url => 
+          fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+            .then(res => res.ok ? res.json() : { data: [] })
+        )
+      )
+
+      const [librosData, eventosData, categoriasData, editorialesData, programasData, materiasData, estudiantesData] = 
+        responses.map(result => result.status === 'fulfilled' ? result.value : { data: [] })
 
       const libros = librosData.data || []
       const librosActivos = libros.filter((libro: any) => libro.estado === "AC")
@@ -74,7 +67,10 @@ export default function Dashboard() {
         librosDisponibles: librosDisponibles,
         totalEventos: (eventosData.data || []).filter((evento: any) => evento.estado === "AC").length,
         totalCategorias: (categoriasData.data || []).filter((cat: any) => cat.estado === "AC").length,
-        totalEditoriales: (editorialesData.data || []).filter((ed: any) => ed.estado === "AC").length
+        totalEditoriales: (editorialesData.data || []).filter((ed: any) => ed.estado === "AC").length,
+        totalProgramas: (programasData.data || []).filter((prog: any) => prog.estado === "AC").length,
+        totalMaterias: (materiasData.data || []).filter((mat: any) => mat.estado === "AC").length,
+        totalEstudiantes: (estudiantesData.data || []).length
       })
     } catch (error) {
       console.error("Error fetching stats:", error)
@@ -155,10 +151,42 @@ export default function Dashboard() {
                 </li>
                 <li className="nav-item">
                   <button
+                    className={`nav-link ${activeTab === "graficas" ? "active" : ""}`}
+                    onClick={() => setActiveTab("graficas")}
+                  >
+                    <i className="bi bi-bar-chart me-2"></i>Gráficas
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className={`nav-link ${activeTab === "estudiantes" ? "active" : ""}`}
+                    onClick={() => setActiveTab("estudiantes")}
+                  >
+                    <i className="bi bi-people me-2"></i>Estudiantes
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className={`nav-link ${activeTab === "programas" ? "active" : ""}`}
+                    onClick={() => setActiveTab("programas")}
+                  >
+                    <i className="bi bi-mortarboard me-2"></i>Programas
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className={`nav-link ${activeTab === "materias" ? "active" : ""}`}
+                    onClick={() => setActiveTab("materias")}
+                  >
+                    <i className="bi bi-book me-2"></i>Materias
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
                     className={`nav-link ${activeTab === "libros" ? "active" : ""}`}
                     onClick={() => setActiveTab("libros")}
                   >
-                    <i className="bi bi-book me-2"></i>Biblioteca
+                    <i className="bi bi-journal me-2"></i>Biblioteca
                   </button>
                 </li>
                 <li className="nav-item">
@@ -207,18 +235,57 @@ export default function Dashboard() {
                   <div className="stats-grid">
                     <div className="stat-card hover-lift animate-slideInLeft">
                       <div className="stat-icon books">
-                        <i className="bi bi-book"></i>
+                        <i className="bi bi-people"></i>
                       </div>
                       <span className="stat-number animate-countUp">
-                        {loading ? "..." : stats.totalLibros}
+                        {loading ? "..." : stats.totalEstudiantes}
                       </span>
-                      <div className="stat-label">Libros Registrados</div>
+                      <div className="stat-label">Estudiantes Registrados</div>
                       <div className="stat-change positive">
-                        <i className="bi bi-arrow-up me-1"></i>Activos en biblioteca
+                        <i className="bi bi-arrow-up me-1"></i>En el sistema
                       </div>
                     </div>
 
                     <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.1s' }}>
+                      <div className="stat-icon categories">
+                        <i className="bi bi-mortarboard"></i>
+                      </div>
+                      <span className="stat-number animate-countUp">
+                        {loading ? "..." : stats.totalProgramas}
+                      </span>
+                      <div className="stat-label">Programas Académicos</div>
+                      <div className="stat-change positive">
+                        <i className="bi bi-check-circle me-1"></i>Activos
+                      </div>
+                    </div>
+
+                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.2s' }}>
+                      <div className="stat-icon editorials">
+                        <i className="bi bi-book"></i>
+                      </div>
+                      <span className="stat-number animate-countUp">
+                        {loading ? "..." : stats.totalMaterias}
+                      </span>
+                      <div className="stat-label">Materias</div>
+                      <div className="stat-change positive">
+                        <i className="bi bi-collection me-1"></i>Disponibles
+                      </div>
+                    </div>
+
+                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.3s' }}>
+                      <div className="stat-icon books">
+                        <i className="bi bi-journal"></i>
+                      </div>
+                      <span className="stat-number animate-countUp">
+                        {loading ? "..." : stats.totalLibros}
+                      </span>
+                      <div className="stat-label">Libros en Biblioteca</div>
+                      <div className="stat-change positive">
+                        <i className="bi bi-arrow-up me-1"></i>Registrados
+                      </div>
+                    </div>
+
+                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.4s' }}>
                       <div className="stat-icon books">
                         <i className="bi bi-box"></i>
                       </div>
@@ -227,11 +294,11 @@ export default function Dashboard() {
                       </span>
                       <div className="stat-label">Ejemplares Disponibles</div>
                       <div className="stat-change positive">
-                        <i className="bi bi-check-circle me-1"></i>Listos para préstamo
+                        <i className="bi bi-check-circle me-1"></i>Para préstamo
                       </div>
                     </div>
 
-                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.2s' }}>
+                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.5s' }}>
                       <div className="stat-icon events">
                         <i className="bi bi-calendar-event"></i>
                       </div>
@@ -244,7 +311,7 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.3s' }}>
+                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.6s' }}>
                       <div className="stat-icon categories">
                         <i className="bi bi-tags"></i>
                       </div>
@@ -257,7 +324,7 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.4s' }}>
+                    <div className="stat-card hover-lift animate-slideInLeft" style={{ animationDelay: '0.7s' }}>
                       <div className="stat-icon editorials">
                         <i className="bi bi-building"></i>
                       </div>
@@ -280,34 +347,52 @@ export default function Dashboard() {
                     </div>
                     <div className="content-card-body">
                       <div className="row">
-                        <div className="col-md-3 mb-3">
+                        <div className="col-md-2 mb-3">
                           <button 
                             className="btn-itla-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
+                            onClick={() => setActiveTab("estudiantes")}
+                          >
+                            <i className="bi bi-person-plus mb-2" style={{ fontSize: '2rem' }}></i>
+                            <span>Nuevo Estudiante</span>
+                          </button>
+                        </div>
+                        <div className="col-md-2 mb-3">
+                          <button 
+                            className="btn-itla-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
+                            onClick={() => setActiveTab("programas")}
+                          >
+                            <i className="bi bi-mortarboard-fill mb-2" style={{ fontSize: '2rem' }}></i>
+                            <span>Nuevo Programa</span>
+                          </button>
+                        </div>
+                        <div className="col-md-2 mb-3">
+                          <button 
+                            className="btn-itla-outline w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
+                            onClick={() => setActiveTab("materias")}
+                          >
+                            <i className="bi bi-book-half mb-2" style={{ fontSize: '2rem' }}></i>
+                            <span>Nueva Materia</span>
+                          </button>
+                        </div>
+                        <div className="col-md-2 mb-3">
+                          <button 
+                            className="btn-itla-outline w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
                             onClick={() => setActiveTab("libros")}
                           >
-                            <i className="bi bi-plus-circle mb-2" style={{ fontSize: '2rem' }}></i>
+                            <i className="bi bi-journal-plus mb-2" style={{ fontSize: '2rem' }}></i>
                             <span>Nuevo Libro</span>
                           </button>
                         </div>
-                        <div className="col-md-3 mb-3">
-                          <button 
-                            className="btn-itla-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
-                            onClick={() => setActiveTab("eventos")}
-                          >
-                            <i className="bi bi-calendar-plus mb-2" style={{ fontSize: '2rem' }}></i>
-                            <span>Nuevo Evento</span>
-                          </button>
-                        </div>
-                        <div className="col-md-3 mb-3">
+                        <div className="col-md-2 mb-3">
                           <button 
                             className="btn-itla-outline w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
-                            onClick={() => setActiveTab("editoriales")}
+                            onClick={() => setActiveTab("graficas")}
                           >
-                            <i className="bi bi-building-add mb-2" style={{ fontSize: '2rem' }}></i>
-                            <span>Nueva Editorial</span>
+                            <i className="bi bi-bar-chart mb-2" style={{ fontSize: '2rem' }}></i>
+                            <span>Ver Gráficas</span>
                           </button>
                         </div>
-                        <div className="col-md-3 mb-3">
+                        <div className="col-md-2 mb-3">
                           <button 
                             className="btn-itla-outline w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3"
                             onClick={fetchStats}
@@ -322,6 +407,10 @@ export default function Dashboard() {
                 </div>
               )}
 
+              {activeTab === "graficas" && <Graficas />}
+              {activeTab === "estudiantes" && <Estudiantes />}
+              {activeTab === "programas" && <ProgramasAcademicos />}
+              {activeTab === "materias" && <Materias />}
               {activeTab === "libros" && <Libros />}
               {activeTab === "eventos" && <Eventos />}
               {activeTab === "categorias" && <CategoriasEventos />}
