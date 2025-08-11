@@ -12,6 +12,7 @@ import Estudiantes from "./Estudiantes"
 import Graficas from "./Graficas"
 import type { EstadisticasGenerales } from "@/types/interfaces"
 import Cuatrimestres from "./Cuatrimestre"
+import UnicdaPage from "@/app/unicda/page"
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [stats, setStats] = useState<EstadisticasGenerales>({
@@ -221,6 +222,14 @@ export default function Dashboard() {
                     <i className="bi bi-calendar2-week me-2"></i>Cuatrimestres
                   </button>
                 </li>
+                <li className="nav-item">
+                  <button
+                    className={`nav-link ${activeTab === "unicda" ? "active" : ""}`}
+                    onClick={() => setActiveTab("unicda")}
+                  >
+                    <i className="bi bi-globe me-2"></i>UNICDA
+                  </button>
+                </li>
               </ul>
             </div>
           </nav>
@@ -424,6 +433,7 @@ export default function Dashboard() {
               {activeTab === "eventos" && <Eventos />}
               {activeTab === "categorias" && <CategoriasEventos />}
               {activeTab === "editoriales" && <Editoriales />}
+              {activeTab === "unicda" && <UnicdaPage />}
             </div>
           </main>
         </>
