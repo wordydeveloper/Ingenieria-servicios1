@@ -18,7 +18,7 @@ export const apiRequest = async (url: string, options: RequestInit = {}, token?:
   // Construimos headers dinamicamente
   const headers: HeadersInit = {}
 
-  // Solo agregamos Content-Type JSON si el body NO es FormData
+  // Solo agregamos Content-Type JSON si el body NO es FormDat
   if (!(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json"
   }
@@ -205,7 +205,7 @@ export const estudianteDocumentosService = {
 
   // Actualizar estado de documento
   updateStatus: async (
-    data: { documentoId: number; estado: string; comentarios?: string },
+    data: { estudianteId: number; documentoId: number; estado: string; comentarios?: string },
     token: string,
   ) => {
     return apiRequest(

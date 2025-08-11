@@ -39,7 +39,7 @@ export default function EstudianteDocumentos({
 
   const estadosDocumento = [
     { value: "PENDIENTE", label: "⏳ Pendiente", color: "bg-warning" },
-    { value: "APROBADO", label: "✅ Aprobado", color: "bg-success" },
+    { value: "VALIDO", label: "✅ Aprobado", color: "bg-success" },
     { value: "RECHAZADO", label: "❌ Rechazado", color: "bg-danger" },
   ]
 
@@ -134,8 +134,9 @@ export default function EstudianteDocumentos({
     try {
       await estudianteDocumentosService.updateStatus(
         {
+          estudianteId: estudianteId,
           documentoId: selectedDocumento.estudianteDocumentoId,
-          estado: reviewData.estado as "PENDIENTE" | "APROBADO" | "RECHAZADO",
+          estado: reviewData.estado as "PENDIENTE" | "VALIDO" | "RECHAZADO",
           comentarios: reviewData.comentarios.trim() || undefined,
         },
         token!,
