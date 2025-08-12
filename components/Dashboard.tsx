@@ -13,6 +13,8 @@ import Graficas from "./Graficas"
 import type { EstadisticasGenerales } from "@/types/interfaces"
 import Cuatrimestres from "./Cuatrimestre"
 import UnicdaPage from "@/app/unicda/page"
+import EstudianteMaterias from "./EstudianteMaterias"
+
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [stats, setStats] = useState<EstadisticasGenerales>({
@@ -158,14 +160,25 @@ export default function Dashboard() {
                     <i className="bi bi-bar-chart me-2"></i>Gráficas
                   </button>
                 </li>
+
                 <li className="nav-item">
                   <button
                     className={`nav-link ${activeTab === "estudiantes" ? "active" : ""}`}
                     onClick={() => setActiveTab("estudiantes")}
+                    
                   >
                     <i className="bi bi-people me-2"></i>Estudiantes
                   </button>
                 </li>
+                <li className="nav-item">
+                <button
+                  className={`nav-link ${activeTab === "inscripciones" ? "active" : ""}`}
+                  onClick={() => setActiveTab("inscripciones")}
+                >
+                  <i className="bi bi-journal-check me-2"></i>Inscripciones
+                </button>
+              </li>
+
                 <li className="nav-item">
                   <button
                     className={`nav-link ${activeTab === "programas" ? "active" : ""}`}
@@ -234,19 +247,19 @@ export default function Dashboard() {
             </div>
           </nav>
 
-          {/* Contenido Principal */}
-          <main className="itla-dashboard">
-            <div className="container-fluid">
-              {activeTab === "dashboard" && (
-                <div className="animate-fadeIn">
-                  <div className="dashboard-header">
-                    <h1 className="dashboard-title">
-                      <i className="bi bi-speedometer2 me-3"></i>Panel de Control
-                    </h1>
-                    <p className="dashboard-subtitle">
-                      Bienvenido al sistema de gestión académica del Instituto Tecnológico de Las Américas
-                    </p>
-                  </div>
+            {/* Contenido Principal */}
+            <main className="itla-dashboard">
+              <div className="container-fluid">
+                {activeTab === "dashboard" && (
+                  <div className="animate-fadeIn">
+                    <div className="dashboard-header">
+                      <h1 className="dashboard-title">
+                        <i className="bi bi-speedometer2 me-3"></i>Panel de Control
+                      </h1>
+                      <p className="dashboard-subtitle">
+                        Bienvenido al sistema de gestión académica del Instituto Tecnológico de Las Américas
+                      </p>
+                    </div>
 
                   {/* Estadísticas */}
                   <div className="stats-grid">
@@ -427,6 +440,7 @@ export default function Dashboard() {
               {activeTab === "cuatrimestres" && <Cuatrimestres />}
               {activeTab === "graficas" && <Graficas />}
               {activeTab === "estudiantes" && <Estudiantes />}
+              {activeTab === "inscripciones" && <EstudianteMaterias />}
               {activeTab === "programas" && <ProgramasAcademicos />}
               {activeTab === "materias" && <Materias />}
               {activeTab === "libros" && <Libros />}
