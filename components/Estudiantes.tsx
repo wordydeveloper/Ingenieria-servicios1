@@ -357,7 +357,7 @@ export default function Estudiantes() {
               </div>
               <div className="col-md-6 text-end">
                 <small className="text-muted">
-                  Mostrando {estudiantes.length} de {paginacion.total} estudiantes
+                  Mostrando {estudiantes.length} estudiantes
                 </small>
               </div>
             </div>
